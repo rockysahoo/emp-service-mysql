@@ -3,7 +3,11 @@ package emp.data.service.mysql.controller;
 import emp.data.service.mysql.dao.Employee;
 import emp.data.service.mysql.repository.EmployeeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController // This means that this class is a Rest Controller
 @RequestMapping(path="/app/v1")
@@ -14,21 +18,27 @@ public class EmployeeController {
 
     //http://localhost:8080/app/v1/add?name=Rockyy&email=abcd@gmail.com
     @PostMapping(path="/add") // Map ONLY POST Requests
-    public String addNewUser (@RequestParam String name, @RequestParam String email) {
+    public ResponseEntity<String> addNewUser (@RequestParam String name, @RequestParam String email) {
         // @RequestParam means it is a parameter from the GET or POST request
 
         Employee n = new Employee();
         n.setName(name);
         n.setEmail(email);
         empRepository.save(n);
-        return "Saved";
+
+        return new ResponseEntity<>("Success", HttpStatus.CREATED);
+
     }
 
     //http://localhost:8080/app/v1/all
     @GetMapping(value = "/all")
-    public Iterable<Employee> getAllUsers() {
+    public ResponseEntity<Object> getAllUsers() {
         // This returns a JSON or XML with the users
-        return empRepository.findAll();
+        List<Employee> employeesList = null;
+
+        employeesList = empRepository.findAll();
+
+        return new ResponseEntity<>(employeesList, HttpStatus.OK);
     }
 
 }
