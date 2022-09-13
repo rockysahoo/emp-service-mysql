@@ -41,6 +41,7 @@ public class EmployeeController {
 
     // Update operation
     //http://localhost:8080/app/v1/employee/1
+    //Request body, {"email": "mama@gmail.com"}
     @PutMapping("/employee/{id}")
     public Employee updateEmail(@RequestBody Employee employee,
                      @PathVariable("id") Long empId)
@@ -51,9 +52,9 @@ public class EmployeeController {
     // Delete operation
     @DeleteMapping("/employee/{id}")
     public String deleteEmployeeById(@PathVariable("id")
-                                       Long departmentId)
+                                       Long empId)
     {
-        employeeService.deleteEmployeeById(departmentId);
+        employeeService.deleteEmployeeById(empId);
         return "Deleted Successfully";
     }
 

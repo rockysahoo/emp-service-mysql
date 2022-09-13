@@ -41,9 +41,11 @@ public class EmployeeService {
     //Update operation
     public Employee updateEmail(Employee employee, Long empId) {
 
-        Employee empDB
-                = employeeRepository.findById(Math.toIntExact(empId))
-                                    .get();
+        Employee empDB = null;
+        if (Objects.nonNull(empId) && !empId.equals("")){
+            empDB = employeeRepository.findById(Math.toIntExact(empId))
+                    .get();
+        }
 
         if (Objects.nonNull(employee.getEmail()) && !"".equalsIgnoreCase(employee.getEmail())) {
             empDB.setEmail(employee.getEmail());
