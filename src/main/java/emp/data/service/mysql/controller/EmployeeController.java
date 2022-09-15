@@ -20,9 +20,20 @@ public class EmployeeController {
     //http://localhost:8080/app/v1/employee/add?name=Rockyy&email=abcd@gmail.com
     @PostMapping(path="employee/add") // Map ONLY POST Requests
     public ResponseEntity<String> addNewUser (@RequestParam String name, @RequestParam String email) {
-        // @RequestParam means it is a parameter from the GET or POST request
+        // @RequestParam means it is a parameter from the GET or POST request as Query Param
 
         employeeService.addNewUser(name, email);
+
+        return new ResponseEntity<>("Success", HttpStatus.CREATED);
+
+    }
+    //http://localhost:8080/app/v1/employee/add
+    //{}
+    @PostMapping(path="employee/addUser") // Map ONLY POST Requests
+    public ResponseEntity<String> addNewUserDetails (@RequestBody Employee employee) {
+        // @RequestBody means it is taking data as DTO
+
+        employeeService.addNewUser(employee);
 
         return new ResponseEntity<>("Success", HttpStatus.CREATED);
 
@@ -50,6 +61,7 @@ public class EmployeeController {
     }
 
     // Delete operation
+    //http://localhost:8080/app/v1/employee/4
     @DeleteMapping("/employee/{id}")
     public String deleteEmployeeById(@PathVariable("id")
                                        Long empId)

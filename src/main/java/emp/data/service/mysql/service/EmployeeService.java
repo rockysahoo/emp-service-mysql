@@ -16,7 +16,6 @@ public class EmployeeService {
     @Autowired
     EmployeeRepository employeeRepository;
 
-
     public ResponseEntity<String> addNewUser(String name, String email) {
 
         Employee n = new Employee();
@@ -24,16 +23,13 @@ public class EmployeeService {
         n.setEmail(email);
 
         employeeRepository.save(n);
-
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     public List<Employee> findAll() {
 
         List<Employee> employeeList = null;
-
         employeeList = employeeRepository.findAll();
-
         return employeeList;
 
     }
@@ -46,19 +42,22 @@ public class EmployeeService {
             empDB = employeeRepository.findById(Math.toIntExact(empId))
                     .get();
         }
-
         if (Objects.nonNull(employee.getEmail()) && !"".equalsIgnoreCase(employee.getEmail())) {
             empDB.setEmail(employee.getEmail());
         }
-
         return employeeRepository.save(empDB);
 
     }
 
 
     public void deleteEmployeeById(Long empId) {
-
         employeeRepository.deleteById(Math.toIntExact(empId));
+
+    }
+
+    public void addNewUser(Employee employee) {
+
+        employeeRepository.save(employee);
 
     }
 }
