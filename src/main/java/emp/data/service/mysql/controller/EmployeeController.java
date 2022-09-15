@@ -27,8 +27,8 @@ public class EmployeeController {
         return new ResponseEntity<>("Success", HttpStatus.CREATED);
 
     }
-    //http://localhost:8080/app/v1/employee/add
-    //{}
+    //http://localhost:8080/app/v1/employee/addUser
+    //{"name": "Pratik","email": "pratik@gmail.com"}
     @PostMapping(path="employee/addUser") // Map ONLY POST Requests
     public ResponseEntity<String> addNewUserDetails (@RequestBody Employee employee) {
         // @RequestBody means it is taking data as DTO
@@ -67,6 +67,7 @@ public class EmployeeController {
                                        Long empId)
     {
         employeeService.deleteEmployeeById(empId);
+
         return "Deleted Successfully";
     }
 
