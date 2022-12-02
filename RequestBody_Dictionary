@@ -1,0 +1,25 @@
+{
+    "domain": {
+        "name": "BSS"
+    },
+    "releaseVersion": [
+        {
+            "name": "Release Version 1"
+        },
+        {
+            "name": "Release Version 2"
+        }
+    ],
+    "applications": [
+        {
+            "name": "CDC",
+            "url": "www.cdc.com",
+            "classifier": "NA"
+        },
+        {
+            "name": "ACM",
+            "url": "www.acm.com",
+            "classifier": "NA"
+        }
+    ]
+}
