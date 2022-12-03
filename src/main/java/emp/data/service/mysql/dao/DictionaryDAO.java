@@ -3,11 +3,14 @@ package emp.data.service.mysql.dao;
 import emp.data.service.mysql.mapper.DomainRowMapper;
 import emp.data.service.mysql.model.ApplicationArtifact;
 import emp.data.service.mysql.model.DictionaryRequest;
+import emp.data.service.mysql.model.Domain;
 import emp.data.service.mysql.model.DomainReleaseName;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.Resource;
@@ -17,21 +20,28 @@ import java.util.Map;
 @Repository
 public class DictionaryDAO {
 
+    private static final Logger log = LoggerFactory.getLogger(DictionaryDAO.class);
+
+    //Insert to Domain table
+    final String DOMAIN_TABLE_INSERT = "INSERT INTO domain (id, name) VALUES (:id, :name)";
+    final String DOMAIN_RELEASE_TABLE_INSERT = "INSERT INTO domain_release (id, domain_id, name) VALUES (:id, :domain_id, :name)";
+    final String APPLICATION_TABLE_INSERT = "INSERT INTO application_artifact (id, classifier, name, url) VALUES (:id, :classifier, :name, :url)";
+    final String SELECT_DOMAIN_NAME = "SELECT * FROM domain WHERE name = ?";
+
+
     @Resource(name = "namedParameterJdbcTemplate")
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
 
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
     public void addDictionary(DictionaryRequest dictionaryRequest) {
-
-        //Insert to Domain table
-        final String DOMAIN_TABLE_INSERT = "INSERT INTO domain (id, name) VALUES (:id, :name)";
-        final String DOMAIN_RELEASE_TABLE_INSERT = "INSERT INTO domain_release (id, domain_id, name) VALUES (:id, :domain_id, :name)";
-        final String APPLICATION_TABLE_INSERT = "INSERT INTO application_artifact (id, classifier, name, url) VALUES (:id, :classifier, :name, :url)";
-
 
         //domain table update
         if (dictionaryRequest.getDomain() != null) {
 
+            //check not null otherwise take empty "" string
             String domainName = StringUtils.isNotEmpty(dictionaryRequest.getDomain().getName()) ?
                     dictionaryRequest.getDomain().getName() : "";
 
@@ -45,8 +55,11 @@ public class DictionaryDAO {
             namedParameterJdbcTemplate.update(DOMAIN_TABLE_INSERT, paramMap);
         }
 
+        //Get Domain Id
+        Integer domainId = getDomainIdByName(dictionaryRequest.getDomain().getName());
+
         //domain_release table update
-        if (dictionaryRequest.getReleaseVersion() != null) {
+        if (dictionaryRequest.getReleaseVersion() != null && dictionaryRequest.getReleaseVersion().size() > 0) {
 
             Map<String, Object> paramMapForReleaseTable = new HashMap<>();
             int count = 1;
@@ -54,15 +67,16 @@ public class DictionaryDAO {
 
                 count++;
                 paramMapForReleaseTable.put("id", count);
-                paramMapForReleaseTable.put("domain_id", 1);
-                paramMapForReleaseTable.put("name", domainReleaseName.getName());
+                paramMapForReleaseTable.put("domain_id", domainId);
+                //check not null otherwise take empty "" string
+                paramMapForReleaseTable.put("name", StringUtils.isNotEmpty(domainReleaseName.getName()) ? domainReleaseName.getName() : "");
 
                 namedParameterJdbcTemplate.update(DOMAIN_RELEASE_TABLE_INSERT, paramMapForReleaseTable);
             }
         }
 
             //application_artifact table update
-            if (dictionaryRequest.getApplications() != null) {
+            if (dictionaryRequest.getApplications() != null && dictionaryRequest.getApplications().size() > 0) {
 
                 Map<String, Object> paramMapForApplicationTable = new HashMap<>();
                 int countAgain = 1;
@@ -82,4 +96,17 @@ public class DictionaryDAO {
 
 
         }
+
+    private Integer getDomainIdByName(String name) {
+
+
+        Domain domainDetails = jdbcTemplate.queryForObject(SELECT_DOMAIN_NAME,
+                new DomainRowMapper(), new Object[]{name});
+
+        log.debug("Domain ::" + domainDetails);
+        System.out.println("Domain ::" + domainDetails);
+
+        return domainDetails.getId();
+
     }
+}
